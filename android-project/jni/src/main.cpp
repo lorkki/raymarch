@@ -145,7 +145,7 @@ void Demo::init ()
 		"Cool Demo",
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		m_mode.w, m_mode.h,
-		SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL
+		SDL_WINDOW_FULLSCREEN | SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN
 		);
 
 	if (!m_window)
@@ -154,9 +154,22 @@ void Demo::init ()
 		return;
 	}
 
+	m_mode.format = SDL_PIXELFORMAT_RGBA8888;
+
+	//SDL_SetWindowFullscreen(m_window, 0);
+	SDL_SetWindowDisplayMode(m_window, &m_mode);
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES); 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2); 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_EGL, 1);
+
+	SDL_GL_SetAttribute(SDL_GL_RED_SIZE,	8);
+	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,	8);
+	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,	8);
+	SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,	0);
+	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,	24);
 
 	m_context = SDL_GL_CreateContext(m_window);
 
@@ -166,8 +179,10 @@ void Demo::init ()
 		return;
 	}
 
-	SDL_GL_SetSwapInterval(1);
+	SDL_GetCurrentDisplayMode(0, &m_mode);
 
+	SDL_GL_SetSwapInterval(1);
+	
 	glViewport(0, 0, m_mode.w, m_mode.h);
 
 	glClearColor(1, 0, 0, 0);
@@ -358,7 +373,7 @@ void Demo::run ()
 		glUniform1f(m_uTime, currentTime);
 		CHECK_GL();
 
-		glUniform3f(m_uCamPos, -sin(currentTime)*8.0, 4, cos(currentTime)*8.0);
+		glUniform3f(m_uCamPos, -sin(0.3*currentTime)*8.0, 2.0+sin(0.3*currentTime), cos(0.3*currentTime)*8.0);
 		CHECK_GL();
 
 		drawQuad();
