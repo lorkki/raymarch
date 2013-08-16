@@ -334,6 +334,35 @@ public class SDLActivity extends Activity {
     }
 
 
+    public static void logEGLConfig(EGLConfig config)
+    {
+        EGL10 egl = (EGL10)EGLContext.getEGL();
+
+        Log.d("SDL", "Config info:");
+
+        int[] value = new int[5];
+
+        int buffer_size, red_size, green_size, blue_size, alpha_size;
+
+        egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, config, EGL10.EGL_BUFFER_SIZE, value);
+        buffer_size = value[0];
+        egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, config, EGL10.EGL_RED_SIZE,   value);
+        red_size    = value[0];
+        egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, config, EGL10.EGL_GREEN_SIZE, value);
+        green_size  = value[0];
+        egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, config, EGL10.EGL_BLUE_SIZE,  value);
+        blue_size   = value[0];
+        egl.eglGetConfigAttrib(SDLActivity.mEGLDisplay, config, EGL10.EGL_ALPHA_SIZE, value);
+        alpha_size  = value[0];
+
+        Log.d("SDL", "Buffer size: " + buffer_size);
+        Log.d("SDL", "Red size:    " + red_size);
+        Log.d("SDL", "Green size:  " + green_size);
+        Log.d("SDL", "Blue size:   " + blue_size);
+        Log.d("SDL", "Alpha size:  " + alpha_size);
+    }
+
+
     // EGL functions
     public static boolean initEGL(int majorVersion, int minorVersion, int[] attribs) {
         try {
@@ -388,6 +417,8 @@ public class SDLActivity extends Activity {
                 }
                 
                 Log.d("SDL", "Selected mode with a total bit difference of " + bestdiff);
+
+                logEGLConfig(config);
 
                 SDLActivity.mEGLConfig = config;
                 SDLActivity.mGLMajor = majorVersion;
@@ -634,6 +665,8 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
     public void surfaceChanged(SurfaceHolder holder,
                                int format, int width, int height) {
         Log.v("SDL", "surfaceChanged()");
+
+        format = PixelFormat.RGBX_8888;
 
         int sdlFormat = 0x15151002; // SDL_PIXELFORMAT_RGB565 by default
         switch (format) {
